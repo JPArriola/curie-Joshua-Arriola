@@ -140,13 +140,16 @@
           selectedTeam: TEAMS[0],
           shouldShowOptions: false
         }
+
+        this.onTriggerClick = this.onTriggerClick.bind(this);
+        this.onOptionClick = this.onOptionClick.bind(this);
       }
 
       // EVENT HANDLERS
 
       onTriggerClick() {
         const { shouldShowOptions } = this.state;
-
+        // console.log("i'm clicking");
         this.setState({
           shouldShowOptions: !shouldShowOptions
         });
@@ -164,10 +167,7 @@
       renderTrigger() {
         const { selectedTeam } = this.state;
         return (
-          <div
-            className="Dropdown__trigger"
-            onClick={this.onTriggerClick}
-          >
+          <div className="Dropdown__trigger" onClick={this.onTriggerClick}>
             <IdenticonBadge team={selectedTeam} />
           </div>
         );
@@ -185,11 +185,7 @@
 
       renderOption(team) {
         return (
-          <div
-            key={team.id}
-            className="Dropdown__option"
-            onClick={this.onOptionClick}
-          >
+          <div key={team.id} className="Dropdown__option" onClick={this.onOptionClick}>
             <IdenticonBadge team={team} />
           </div>
         );
