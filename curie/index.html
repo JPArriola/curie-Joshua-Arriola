@@ -108,10 +108,7 @@
 
     const IdenticonBadge = ({ team }) => (
       <div className="IdenticonBadge">
-        <div
-          className="IdenticonBadge__icon"
-          style={{ backgroundColor: team.identicolor }}
-        >
+        <div className="IdenticonBadge__icon" style={{ backgroundColor: team.identicolor }}>
           {team.name[0]}
         </div>
 
@@ -149,7 +146,7 @@
 
       onTriggerClick() {
         const { shouldShowOptions } = this.state;
-        // console.log("i'm clicking");
+        
         this.setState({
           shouldShowOptions: !shouldShowOptions
         });
@@ -185,7 +182,7 @@
 
       renderOption(team) {
         return (
-          <div key={team.id} className="Dropdown__option" onClick={this.onOptionClick}>
+          <div key={team.id} className="Dropdown__option" onClick={() => this.onOptionClick(team)}>
             <IdenticonBadge team={team} />
           </div>
         );
