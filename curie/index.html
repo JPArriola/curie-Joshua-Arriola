@@ -143,8 +143,7 @@
       }
       
       componentDidUpdate(prevProps){
-        if(this.props.teamMembersOpen !== prevProps.teamMembersOpen){
-          console.log("hi componentdidupdate dropdown")
+        if(this.props.outSideClicked !== prevProps.outSideClicked){
           this.setState(() => ({
             shouldShowOptions: false
           }))
@@ -153,7 +152,8 @@
 
       // EVENT HANDLERS
 
-      onTriggerClick() {
+      onTriggerClick(e) {
+        e.stopPropagation();
         const { shouldShowOptions } = this.state;
         
         this.setState({
@@ -220,10 +220,10 @@
 
       render() {
         return (
-          <div className="Dropdown" ref={node => { this.node = node; }}>
+          <div className="Dropdown" >
             {this.renderTrigger()}
             {this.maybeRenderOptions()}
-            <TeamMembers team={this.state.selectedTeam} parentOpen={this.state.shouldShowOptions}/>
+            <TeamMembers team={this.state.selectedTeam} parentOpen={this.state.shouldShowOptions} outSideClicked={this.props.outSideClicked}/>
           </div>
         )
       }
@@ -251,12 +251,18 @@
         if(this.props.parentOpen !== prevProps.parentOpen){
           this.setState({
             shouldShowOptions: false,
-          })
+          });
+        }
+        if(this.props.outSideClicked !== prevProps.outSideClicked){
+          this.setState({
+            shouldShowOptions: false,
+          });
         }
       }
       // EVENT HANDLERS
 
-      onTriggerClick() {
+      onTriggerClick(e) {
+        e.stopPropagation();
         const { shouldShowOptions } = this.state;
         
         this.setState({
@@ -330,13 +336,14 @@
         super(props)
 
         this.state = {
-          anyDropDown: false,
+          openDropdown: false,
         }
       }
 
       handleClick = () => {
+        const {openDropdown} = this.state
         this.setState({
-          anyDropDown: false
+          openDropdown: !openDropdown
         })
       }
 
@@ -345,7 +352,7 @@
           <div className="App" onClick={this.handleClick}>
             <h1>Select a team</h1>
 
-            <Dropdown parentCallback={this.parentCallback} />
+            <Dropdown parentCallback={this.parentCallback} outSideClicked={this.state.openDropdown}/>
           </div>
         );
       }
