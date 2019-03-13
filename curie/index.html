@@ -142,6 +142,15 @@
         this.onOptionClick = this.onOptionClick.bind(this);
       }
       
+      componentDidUpdate(prevProps){
+        if(this.props.teamMembersOpen !== prevProps.teamMembersOpen){
+          console.log("hi componentdidupdate dropdown")
+          this.setState(() => ({
+            shouldShowOptions: false
+          }))
+        }
+      }
+
       // EVENT HANDLERS
 
       onTriggerClick() {
@@ -157,8 +166,6 @@
           selectedTeam: team,
           shouldShowOptions: false
         });
-
-        this.props.parentCallback(team)
       }
 
       handleClick(){
@@ -216,6 +223,7 @@
           <div className="Dropdown" ref={node => { this.node = node; }}>
             {this.renderTrigger()}
             {this.maybeRenderOptions()}
+            <TeamMembers team={this.state.selectedTeam} parentOpen={this.state.shouldShowOptions}/>
           </div>
         )
       }
@@ -239,6 +247,11 @@
           this.setState({
             selectedMember: TEAM_MEMBERS[0],
           });
+        }
+        if(this.props.parentOpen !== prevProps.parentOpen){
+          this.setState({
+            shouldShowOptions: false,
+          })
         }
       }
       // EVENT HANDLERS
@@ -317,21 +330,22 @@
         super(props)
 
         this.state = {
-          dropDownData: TEAMS[0],
+          anyDropDown: false,
         }
       }
 
-      parentCallback = (datafromDropdown) => {
-        this.setState({ dropDownData: datafromDropdown })
+      handleClick = () => {
+        this.setState({
+          anyDropDown: false
+        })
       }
 
       render() {
         return (
-          <div className="App">
+          <div className="App" onClick={this.handleClick}>
             <h1>Select a team</h1>
 
             <Dropdown parentCallback={this.parentCallback} />
-            <TeamMembers team={this.state.dropDownData}/>
           </div>
         );
       }
