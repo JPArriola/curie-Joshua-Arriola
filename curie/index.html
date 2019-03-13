@@ -140,7 +140,8 @@
 
         this.onTriggerClick = this.onTriggerClick.bind(this);
         this.onOptionClick = this.onOptionClick.bind(this);
-        this.handleKey = this.handleKey.bind(this);
+        this.handleOpen = this.handleOpen.bind(this);
+        this.handleSelect = this.handleSelect.bind(this);
       }
       
       componentDidUpdate(prevProps){
@@ -169,9 +170,20 @@
         });
       }
 
-      handleKey(e) {
+      handleOpen(e) {
         if(e.keyCode === 13){
           this.onTriggerClick(e);
+        }
+      }
+
+      handleSelect(e, team, tabIndex, lastValidTab){
+        if(e.keyCode === 13){
+          this.onOptionClick(team)
+        }
+
+        if(e.keyCode === 9 && (tabIndex === lastValidTab)){
+          e.preventDefault();
+          this.firstOptionRef.focus();
         }
       }
 
@@ -180,7 +192,7 @@
       renderTrigger() {
         const { selectedTeam } = this.state;
         return (
-          <div className="Dropdown__trigger" onClick={this.onTriggerClick} onKeyDown={this.handleKey} tabIndex="1">
+          <div className="Dropdown__trigger" onClick={this.onTriggerClick} onKeyDown={this.handleOpen} tabIndex="1">
             <IdenticonBadge team={selectedTeam} />
           </div>
         );
@@ -191,14 +203,23 @@
 
         return shouldShowOptions && (
           <div className="Dropdown__options">
-            {TEAMS.map(team => this.renderOption(team))}
+            {TEAMS.map((team, tabIndex) => {
+              return this.renderOption(team, tabIndex + 1, TEAMS.length)}
+              )}
           </div>
         );
       }
 
-      renderOption(team) {
+      renderOption(team, tabIndex, lastValidTab) {
         return (
-          <div key={team.id} className="Dropdown__option" onClick={() => this.onOptionClick(team)}>
+          <div 
+            tabIndex={tabIndex} 
+            key={team.id}  
+            className="Dropdown__option" 
+            onClick={() => this.onOptionClick(team)} 
+            onKeyDown={(e) => this.handleSelect(e, team, tabIndex, lastValidTab)}
+            ref={ref => tabIndex === 1 ? (this.firstOptionRef = ref): null}
+          >
             <IdenticonBadge team={team} />
           </div>
         );
@@ -209,7 +230,11 @@
           <div className="Dropdown" >
             {this.renderTrigger()}
             {this.maybeRenderOptions()}
-            <TeamMembers team={this.state.selectedTeam} parentOpen={this.state.shouldShowOptions} outSideClicked={this.props.outSideClicked}/>
+            <TeamMembers 
+              team={this.state.selectedTeam} 
+              parentOpen={this.state.shouldShowOptions} 
+              outSideClicked={this.props.outSideClicked}
+            />
           </div>
         )
       }
@@ -226,7 +251,8 @@
 
         this.onTriggerClick = this.onTriggerClick.bind(this);
         this.onOptionClick = this.onOptionClick.bind(this);
-        this.handleKey = this.handleKey.bind(this);
+        this.handleOpen = this.handleOpen.bind(this);
+        this.handleSelect = this.handleSelect.bind(this);
       }
       
       componentDidUpdate(prevProps){
@@ -264,9 +290,20 @@
         });
       }
 
-      handleKey(e) {
+      handleOpen(e) {
         if(e.keyCode === 13){
           this.onTriggerClick(e);
+        }
+      }
+
+      handleSelect(e, member, tabIndex, highestTabVal) {
+        if(e.keyCode === 13){
+          this.onOptionClick(member);
+        }
+
+        if(e.keyCode === 9 && tabIndex === highestTabVal){
+          e.preventDefault();
+          this.myFirstMember.focus();
         }
       }
 
@@ -275,7 +312,12 @@
       renderTrigger() {
         const { selectedMember } = this.state;
         return (
-          <div className="Dropdown__trigger" onClick={this.onTriggerClick} onKeyDown={this.handleKey} tabIndex="10">
+          <div 
+            className="Dropdown__trigger" 
+            onClick={this.onTriggerClick} 
+            onKeyDown={this.handleOpen} 
+            tabIndex="10"
+          >
             <IdenticonBadge team={selectedMember} />
           </div>
         );
@@ -286,20 +328,26 @@
 
         return shouldShowOptions && (
           <div className="Dropdown__options">
-            {TEAM_MEMBERS.map(member => this.renderOption(member))}
+            {TEAM_MEMBERS
+              .filter(member => member.teams.includes(this.props.team.id))
+              .map((member, tabIndex, filtered) => this.renderOption(member, tabIndex + 11, filtered.length + 10))}
           </div>
         );
       }
 
-      renderOption(member) {
-
-        if (member.teams.includes(this.props.team.id)){
-          return (
-            <div key={member.id} className="Dropdown__option" onClick={() => this.onOptionClick(member)}>
-              <IdenticonBadge team={member} />
-            </div>
-          );
-        }
+      renderOption(member, tabIndex, highestTabVal) {
+        return (
+          <div 
+            tabIndex={tabIndex} 
+            key={member.id} 
+            className="Dropdown__option" 
+            onClick={() => this.onOptionClick(member)} 
+            onKeyDown={(e) => this.handleSelect(e, member, tabIndex, highestTabVal)}
+            ref={ref => (tabIndex === 11) ? (this.myFirstMember = ref) : null}
+          >
+            <IdenticonBadge team={member} />
+          </div>
+        );
       }
 
       render() {
