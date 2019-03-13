@@ -141,7 +141,7 @@
         this.onTriggerClick = this.onTriggerClick.bind(this);
         this.onOptionClick = this.onOptionClick.bind(this);
       }
-
+      
       // EVENT HANDLERS
 
       onTriggerClick() {
@@ -157,6 +157,29 @@
           selectedTeam: team,
           shouldShowOptions: false
         });
+
+        this.props.parentCallback(team)
+      }
+
+      handleClick(){
+        console.log("i'm clicking")
+        if (!this.state.shouldShowOptions){
+          document.addEventListener('click', this.handleOutsideClick, false);
+        } else {
+          document.removeEventListener('click', this.handleOutsideClick, false);
+        }
+
+        this.setState(prevState => ({
+          shouldShowOptions: !prevState.shouldShowOptions,
+        }));
+      }
+
+      handleOutsideClick(e){
+        if (this.node.contains(e.target)){
+          this.onTriggerClick();
+        }
+
+        this.handleClick();
       }
 
       // RENDER FUNCTIONS
@@ -190,7 +213,90 @@
 
       render() {
         return (
-          <div className="Dropdown">
+          <div className="Dropdown" ref={node => { this.node = node; }}>
+            {this.renderTrigger()}
+            {this.maybeRenderOptions()}
+          </div>
+        )
+      }
+    }
+
+    class TeamMembers extends React.Component {
+      constructor(props) {
+        super(props);
+
+        this.state = {
+          selectedMember: TEAM_MEMBERS[0],
+          shouldShowOptions: false
+        }
+
+        this.onTriggerClick = this.onTriggerClick.bind(this);
+        this.onOptionClick = this.onOptionClick.bind(this);
+      }
+      
+      componentDidUpdate(prevProps){
+        if(this.props.team !== prevProps.team){
+          this.setState({
+            selectedMember: TEAM_MEMBERS[0],
+          });
+        }
+      }
+      // EVENT HANDLERS
+
+      onTriggerClick() {
+        const { shouldShowOptions } = this.state;
+        
+        this.setState({
+          shouldShowOptions: !shouldShowOptions
+        });
+      }
+
+      onOptionClick(member) {
+        this.setState({
+          selectedMember: member,
+          shouldShowOptions: false
+        });
+      }
+
+      // RENDER FUNCTIONS
+
+      renderTrigger() {
+        const { selectedMember } = this.state;
+        return (
+          <div className="Dropdown__trigger" onClick={this.onTriggerClick}>
+            <IdenticonBadge team={selectedMember} />
+          </div>
+        );
+      }
+
+      maybeRenderOptions() {
+        const { shouldShowOptions } = this.state;
+
+        return shouldShowOptions && (
+          <div className="Dropdown__options">
+            {TEAM_MEMBERS.map(member => this.renderOption(member))}
+          </div>
+        );
+      }
+
+      renderOption(member) {
+
+        if (member.teams.includes(this.props.team.id)){
+          return (
+            <div key={member.id} className="Dropdown__option" onClick={() => this.onOptionClick(member)}>
+              <IdenticonBadge team={member} />
+            </div>
+          );
+        } else {
+          return(
+            <div></div>
+          )
+        }
+      }
+
+      render() {
+        return (
+          <div className="Dropdown" ref={node => { this.node = node; }}>
             {this.renderTrigger()}
             {this.maybeRenderOptions()}
           </div>
@@ -207,12 +313,25 @@
     // React application.
 
     class App extends React.Component {
+      constructor(props){
+        super(props)
+
+        this.state = {
+          dropDownData: TEAMS[0],
+        }
+      }
+
+      parentCallback = (datafromDropdown) => {
+        this.setState({ dropDownData: datafromDropdown })
+      }
+
       render() {
         return (
           <div className="App">
             <h1>Select a team</h1>
 
-            <Dropdown />
+            <Dropdown parentCallback={this.parentCallback} />
+            <TeamMembers team={this.state.dropDownData}/>
           </div>
         );
       }
