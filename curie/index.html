@@ -140,6 +140,7 @@
 
         this.onTriggerClick = this.onTriggerClick.bind(this);
         this.onOptionClick = this.onOptionClick.bind(this);
+        this.handleKey = this.handleKey.bind(this);
       }
       
       componentDidUpdate(prevProps){
@@ -168,25 +169,10 @@
         });
       }
 
-      handleClick(){
-        console.log("i'm clicking")
-        if (!this.state.shouldShowOptions){
-          document.addEventListener('click', this.handleOutsideClick, false);
-        } else {
-          document.removeEventListener('click', this.handleOutsideClick, false);
+      handleKey(e) {
+        if(e.keyCode === 13){
+          this.onTriggerClick(e);
         }
-
-        this.setState(prevState => ({
-          shouldShowOptions: !prevState.shouldShowOptions,
-        }));
-      }
-
-      handleOutsideClick(e){
-        if (this.node.contains(e.target)){
-          this.onTriggerClick();
-        }
-
-        this.handleClick();
       }
 
       // RENDER FUNCTIONS
@@ -194,7 +180,7 @@
       renderTrigger() {
         const { selectedTeam } = this.state;
         return (
-          <div className="Dropdown__trigger" onClick={this.onTriggerClick}>
+          <div className="Dropdown__trigger" onClick={this.onTriggerClick} onKeyDown={this.handleKey} tabIndex="1">
             <IdenticonBadge team={selectedTeam} />
           </div>
         );
@@ -240,6 +226,7 @@
 
         this.onTriggerClick = this.onTriggerClick.bind(this);
         this.onOptionClick = this.onOptionClick.bind(this);
+        this.handleKey = this.handleKey.bind(this);
       }
       
       componentDidUpdate(prevProps){
@@ -277,12 +264,18 @@
         });
       }
 
+      handleKey(e) {
+        if(e.keyCode === 13){
+          this.onTriggerClick(e);
+        }
+      }
+
       // RENDER FUNCTIONS
 
       renderTrigger() {
         const { selectedMember } = this.state;
         return (
-          <div className="Dropdown__trigger" onClick={this.onTriggerClick}>
+          <div className="Dropdown__trigger" onClick={this.onTriggerClick} onKeyDown={this.handleKey} tabIndex="10">
             <IdenticonBadge team={selectedMember} />
           </div>
         );
@@ -306,16 +299,12 @@
               <IdenticonBadge team={member} />
             </div>
           );
-        } else {
-          return(
-            <div></div>
-          )
         }
       }
 
       render() {
         return (
-          <div className="Team Dropdown" ref={node => { this.node = node; }}>
+          <div className="Team Dropdown" >
             {this.renderTrigger()}
             {this.maybeRenderOptions()}
           </div>
@@ -348,11 +337,12 @@
       }
 
       render() {
+        const {openDropdown} = this.state
         return (
           <div className="App" onClick={this.handleClick}>
             <h1>Select a team</h1>
 
-            <Dropdown parentCallback={this.parentCallback} outSideClicked={this.state.openDropdown}/>
+            <Dropdown outSideClicked={openDropdown}/>
           </div>
         );
       }
