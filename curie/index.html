@@ -226,13 +226,14 @@
       }
 
       render() {
+        const {selectedTeam, shouldShowOptions} = this.state;
         return (
           <div className="Dropdown" >
             {this.renderTrigger()}
             {this.maybeRenderOptions()}
             <TeamMembers 
-              team={this.state.selectedTeam} 
-              parentOpen={this.state.shouldShowOptions} 
+              team={selectedTeam} 
+              parentOpen={shouldShowOptions} 
               outSideClicked={this.props.outSideClicked}
             />
           </div>
